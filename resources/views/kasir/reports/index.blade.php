@@ -6,7 +6,7 @@
 @section('content')
     <!-- SUMMARY CARD + PERIOD FILTER -->
     <div class="bg-kasir-green text-white rounded-3xl p-5 shadow-md mb-5">
-        <div class="bg-[#FAF5EE] text-kasir-text rounded-2xl p-4 shadow-xs mb-4">
+        <div class="bg-kasir-bg text-kasir-text rounded-2xl p-4 shadow-xs mb-4">
             @php
                 $periodLabels = ['hari_ini' => 'Hari ini', 'minggu_ini' => 'Minggu ini', 'bulan_ini' => 'Bulan ini', 'semua' => 'Semua'];
             @endphp
@@ -65,7 +65,7 @@
             @foreach($salesByCategory as $category => $amount)
             @php $percentage = $totalRevenue > 0 ? round(($amount / $totalRevenue) * 100) : 0; @endphp
             <div class="flex items-center justify-between text-xs">
-                <span class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full" style="background-color: {{ ['#006A4E', '#E6A15C', '#3B82F6', '#8B5CF6', '#EF4444'][$loop->index % 5] }}"></span>{{ $category }}</span>
+                <span class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full" style="background-color: {{ ['#1B0D80', '#54B5C1', '#8ACBD0', '#7065C6', '#F1E4C8'][$loop->index % 5] }}"></span>{{ $category }}</span>
                 <span class="font-semibold">{{ $percentage }}% · Rp{{ number_format($amount, 0, ',', '.') }}</span>
             </div>
             @endforeach
@@ -144,7 +144,7 @@
                 datasets: [{
                     label: 'Pendapatan',
                     data: revenueData,
-                    backgroundColor: '#E6A15C',
+                    backgroundColor: '#54B5C1',
                     borderRadius: 8,
                     maxBarThickness: 28
                 }]
@@ -170,7 +170,7 @@
                 labels: categoryLabels,
                 datasets: [{
                     data: categoryData,
-                    backgroundColor: ['#006A4E', '#E6A15C', '#3B82F6', '#8B5CF6', '#EF4444'],
+                    backgroundColor: ['#1B0D80', '#54B5C1', '#8ACBD0', '#7065C6', '#F1E4C8'],
                     borderWidth: 0,
                     hoverOffset: 4
                 }]

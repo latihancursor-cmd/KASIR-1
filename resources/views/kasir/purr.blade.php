@@ -13,16 +13,16 @@
                 extend: {
                     colors: {
                         brand: {
-                            bg: '#FDFBF7',
-                            sidebar: '#F9F3EA',
+                            bg: '#E3F2FD',
+                            sidebar: '#E3F2FD',
                             card: '#FFFFFF',
-                            accent: '#E6A15C',
-                            accentHover: '#D48F4A',
-                            brown: '#A47148',
-                            darkBrown: '#5C3A21',
-                            lightBg: '#F5ECE0',
-                            tag: '#F2E3D5',
-                            border: '#E8DEC9'
+                            accent: '#54B5C1',
+                            accentHover: '#3A9EAA',
+                            brown: '#1B0D80',
+                            darkBrown: '#14095F',
+                            lightBg: '#8ACBD0',
+                            tag: '#D9EFF0',
+                            border: '#8ACBD0'
                         }
                     }
                 }
@@ -40,14 +40,14 @@
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #E8DEC9; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #E6A15C; }
+        ::-webkit-scrollbar-thumb { background: #8ACBD0; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #54B5C1; }
     </style>
 </head>
 <body class="bg-[#F6EFE6] text-[#4A3B32] min-h-screen flex items-center justify-center p-3 md:p-6 select-none">
 
     <!-- Container Utama Kasir Purr'Coffee (Responsive Mockup Container) -->
-    <div class="w-full max-w-[1440px] h-[92vh] min-h-[720px] bg-[#FAF5EE] rounded-3xl shadow-2xl border border-brand-border flex overflow-hidden relative" x-data="purrPosApp()">
+    <div class="w-full max-w-[1440px] h-[92vh] min-h-[720px] bg-[#E3F2FD] rounded-3xl shadow-2xl border border-brand-border flex overflow-hidden relative" x-data="purrPosApp()">
         
         <!-- 1. SIDEBAR NAVIGATION -->
         <aside class="w-64 bg-[#F5ECE1] border-r border-brand-border flex flex-col justify-between p-5 shrink-0 hidden md:flex">
@@ -68,7 +68,7 @@
                     <a href="{{ route('kasir.beranda') }}" class="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-medium text-gray-600 hover:bg-brand-tag transition">
                         <i class="fa-solid fa-house w-5 text-center text-gray-400"></i> Beranda
                     </a>
-                    <a href="#" class="flex items-center justify-between px-4 py-3 rounded-2xl text-sm font-semibold bg-[#EEDCC8] text-[#5C3A21] shadow-sm">
+                    <a href="#" class="flex items-center justify-between px-4 py-3 rounded-2xl text-sm font-semibold bg-[#8ACBD0] text-[#1B0D80] shadow-sm">
                         <div class="flex items-center gap-3.5">
                             <i class="fa-solid fa-utensils w-5 text-center text-brand-darkBrown"></i> Menu Utama
                         </div>
@@ -107,7 +107,7 @@
         </aside>
 
         <!-- 2. MAIN CONTENT AREA (Search & Menu Grid) -->
-        <main class="flex-1 flex flex-col min-w-0 bg-[#FAF5EE] overflow-hidden">
+        <main class="flex-1 flex flex-col min-w-0 bg-[#E3F2FD] overflow-hidden">
             
             <!-- HEADER (Search & Filter) -->
             <header class="p-5 pb-2 flex items-center justify-between gap-4">
@@ -149,7 +149,7 @@
                         <div class="bg-white rounded-3xl p-4 shadow-sm border border-brand-border/40 flex flex-col justify-between hover:shadow-md transition duration-200">
                             <div>
                                 <!-- Image Card Thumbnail -->
-                                <div class="w-full h-36 bg-[#F5ECE0] rounded-2xl overflow-hidden mb-3 relative flex items-center justify-center group">
+                                <div class="w-full h-36 bg-[#E3F2FD] rounded-2xl overflow-hidden mb-3 relative flex items-center justify-center group">
                                     <img :src="product.image" :alt="product.name" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                                     <span class="absolute top-2 right-2 bg-white/90 backdrop-blur-md px-2.5 py-0.5 rounded-full text-[10px] font-bold text-brand-darkBrown shadow-xs" x-text="product.category"></span>
                                 </div>
@@ -223,7 +223,7 @@
                 <!-- Cart Items List Container -->
                 <div class="space-y-3 max-h-[320px] overflow-y-auto pr-1">
                     <template x-for="(item, index) in cart" :key="index">
-                        <div class="flex items-center justify-between gap-3 p-2.5 bg-[#FDFBF7] rounded-2xl border border-brand-border/40 hover:border-brand-accent/40 transition">
+                        <div class="flex items-center justify-between gap-3 p-2.5 bg-[#FFFFFF] rounded-2xl border border-brand-border/40 hover:border-brand-accent/40 transition">
                             <div class="w-12 h-12 bg-[#EFE6DC] rounded-xl overflow-hidden shrink-0">
                                 <img :src="item.image" :alt="item.name" class="w-full h-full object-cover">
                             </div>

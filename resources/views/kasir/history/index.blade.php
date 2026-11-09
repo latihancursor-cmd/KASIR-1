@@ -6,7 +6,7 @@
 @section('content')
     <!-- SUMMARY CARD (Hijau / Krem sesuai screenshot) -->
     <div class="bg-kasir-green text-white rounded-3xl p-6 shadow-md mb-5">
-        <div class="bg-[#FAF5EE] text-kasir-text rounded-2xl p-5 shadow-xs mb-4">
+        <div class="bg-kasir-bg text-kasir-text rounded-2xl p-5 shadow-xs mb-4">
             <p class="text-xs text-gray-500 font-medium mb-1">Pendapatan • {{ str_replace('_', ' ', $period) }}</p>
             <p class="text-3xl font-extrabold text-kasir-green mb-4">Rp{{ number_format($totalRevenue, 0, ',', '.') }}</p>
             

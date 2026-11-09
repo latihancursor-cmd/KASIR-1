@@ -317,7 +317,7 @@ function posApp() {
                     </tr>
                     <tr style="border-top: 1px dashed #ddd;">
                         <td style="padding: 6px 0 0 0; font-size: 12px; font-weight: bold;">Kembalian</td>
-                        <td style="text-align: right; padding: 6px 0 0 0; font-size: 12px; font-weight: bold; color: #E6A15C;">${this.formatRupiah(receipt.change)}</td>
+                        <td style="text-align: right; padding: 6px 0 0 0; font-size: 12px; font-weight: bold; color: #54B5C1;">${this.formatRupiah(receipt.change)}</td>
                     </tr>
                 `;
             }

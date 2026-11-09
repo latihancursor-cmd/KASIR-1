@@ -14,15 +14,15 @@
                 extend: {
                     colors: {
                         kasir: {
-                            green: '#006A4E',
-                            darkGreen: '#004D38',
-                            bg: '#FAF5EE',
+                            green: '#1B0D80',
+                            darkGreen: '#14095F',
+                            bg: '#E3F2FD',
                             card: '#FFFFFF',
-                            orange: '#E6A15C',
-                            darkOrange: '#D48F4A',
-                            border: '#E8DEC9',
-                            text: '#2D3748',
-                            grayText: '#718096'
+                            orange: '#54B5C1',
+                            darkOrange: '#3A9EAA',
+                            border: '#8ACBD0',
+                            text: '#1B0D80',
+                            grayText: '#5E7180'
                         }
                     }
                 }
@@ -40,14 +40,14 @@
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #FAF5EE;
+            background-color: #E3F2FD;
             color: #2D3748;
         }
         /* Custom scrollbar */
         ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #E8DEC9; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #E6A15C; }
+        ::-webkit-scrollbar-thumb { background: #8ACBD0; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #54B5C1; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between pb-20 md:pb-0">

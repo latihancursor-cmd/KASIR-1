@@ -13,16 +13,16 @@
                 extend: {
                     colors: {
                         brand: {
-                            bg: '#FDFBF7',
-                            sidebar: '#F9F3EA',
+                            bg: '#E3F2FD',
+                            sidebar: '#E3F2FD',
                             card: '#FFFFFF',
-                            accent: '#E6A15C',
-                            accentHover: '#D48F4A',
-                            brown: '#A47148',
-                            darkBrown: '#5C3A21',
-                            lightBg: '#F5ECE0',
-                            tag: '#F2E3D5',
-                            border: '#E8DEC9'
+                            accent: '#54B5C1',
+                            accentHover: '#3A9EAA',
+                            brown: '#1B0D80',
+                            darkBrown: '#14095F',
+                            lightBg: '#8ACBD0',
+                            tag: '#D9EFF0',
+                            border: '#8ACBD0'
                         }
                     }
                 }
@@ -42,8 +42,8 @@
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #E8DEC9; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #E6A15C; }
+        ::-webkit-scrollbar-thumb { background: #8ACBD0; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #54B5C1; }
         
         /* Shimmer Loading Animation */
         @keyframes shimmer {
@@ -52,7 +52,7 @@
         }
         .shimmer {
             animation: shimmer 2s infinite linear;
-            background: linear-gradient(to right, #F5ECE0 4%, #E8DEC9 25%, #F5ECE0 36%);
+            background: linear-gradient(to right, #E3F2FD 4%, #E8DEC9 25%, #E3F2FD 36%);
             background-size: 1000px 100%;
         }
     </style>
@@ -60,7 +60,7 @@
 <body class="bg-[#F6EFE6] text-[#4A3B32] min-h-screen flex items-center justify-center p-3 md:p-6">
 
     <!-- Container Utama Beranda -->
-    <div class="w-full max-w-[1440px] h-[92vh] min-h-[720px] bg-[#FAF5EE] rounded-3xl shadow-2xl border border-brand-border flex overflow-hidden" x-data="berandaApp()">
+    <div class="w-full max-w-[1440px] h-[92vh] min-h-[720px] bg-[#E3F2FD] rounded-3xl shadow-2xl border border-brand-border flex overflow-hidden" x-data="berandaApp()">
         
         <!-- SIDEBAR NAVIGATION (Sama seperti Menu) -->
         <aside class="w-64 bg-[#F5ECE1] border-r border-brand-border flex flex-col justify-between p-5 shrink-0 hidden md:flex">
@@ -78,7 +78,7 @@
 
                 <!-- Nav Menu Items -->
                 <nav class="space-y-1.5">
-                    <a href="{{ route('kasir.beranda') }}" class="flex items-center justify-between px-4 py-3 rounded-2xl text-sm font-semibold bg-[#EEDCC8] text-[#5C3A21] shadow-sm">
+                    <a href="{{ route('kasir.beranda') }}" class="flex items-center justify-between px-4 py-3 rounded-2xl text-sm font-semibold bg-[#8ACBD0] text-[#1B0D80] shadow-sm">
                         <div class="flex items-center gap-3.5">
                             <i class="fa-solid fa-house w-5 text-center text-brand-darkBrown"></i> Beranda
                         </div>
@@ -119,7 +119,7 @@
         </aside>
 
         <!-- MAIN CONTENT BERANDA -->
-        <main class="flex-1 flex flex-col min-w-0 bg-[#FAF5EE] overflow-hidden">
+        <main class="flex-1 flex flex-col min-w-0 bg-[#E3F2FD] overflow-hidden">
             
             <!-- HEADER GREETING -->
             <header class="p-6 pb-4 border-b border-brand-border/40">
@@ -254,7 +254,7 @@
                         </div>
                         <div class="space-y-2.5 max-h-[320px] overflow-y-auto">
                             @forelse($lastTransactions ?? [] as $trx)
-                            <div class="flex items-center justify-between p-3 bg-[#FDFBF7] rounded-xl border border-brand-border/40 hover:border-brand-accent/40 transition">
+                            <div class="flex items-center justify-between p-3 bg-[#FFFFFF] rounded-xl border border-brand-border/40 hover:border-brand-accent/40 transition">
                                 <div class="flex items-center gap-3">
                                     <div class="w-10 h-10 rounded-lg bg-[#F7F1E8] flex items-center justify-center text-brand-brown">
                                         <i class="fa-solid fa-receipt"></i>
@@ -290,7 +290,7 @@
                         </div>
                         <div class="space-y-2.5">
                             @foreach($topProducts ?? [] as $index => $prod)
-                            <div class="flex items-center justify-between p-3 bg-[#FDFBF7] rounded-xl border border-brand-border/40">
+                            <div class="flex items-center justify-between p-3 bg-[#FFFFFF] rounded-xl border border-brand-border/40">
                                 <div class="flex items-center gap-3">
                                     <div class="w-8 h-8 rounded-lg {{ $index === 0 ? 'bg-amber-500' : ($index === 1 ? 'bg-gray-400' : ($index === 2 ? 'bg-amber-700' : 'bg-[#F7F1E8]')) }} flex items-center justify-center text-white font-bold text-sm">
                                         {{ $index + 1 }}
