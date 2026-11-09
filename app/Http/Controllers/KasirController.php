@@ -383,31 +383,45 @@ class KasirController extends Controller
     // ==================== LAPORAN PENJUALAN ====================
     public function reports(Request $request)
     {
-        $period = $request->get('period', '7_hari');
-        
+        $period = $request->get('period', 'hari_ini');
         $query = Sale::with('product.category');
-        
+
         switch ($period) {
-            case '7_hari':
-                $startDate = now()->subDays(7);
-                $query->where('created_at', '>=', $startDate);
+            case 'hari_ini':
+                $query->whereDate('created_at', today());
                 break;
-            case '30_hari':
-                $startDate = now()->subDays(30);
-                $query->where('created_at', '>=', $startDate);
+            case 'minggu_ini':
+                $query->whereBetween('created_at', [now()->startOfWeek(), now()->endOfDay()]);
                 break;
             case 'bulan_ini':
                 $query->whereMonth('created_at', now()->month)
                       ->whereYear('created_at', now()->year);
-                $startDate = now()->startOfMonth();
                 break;
+            case 'semua':
+                break;
+            default:
+                $period = 'hari_ini';
+                $query->whereDate('created_at', today());
         }
-        
+
         $sales = $query->get();
+        $totalItemsSold = (int) $sales->sum('quantity');
+        $cashRevenue = (float) $sales->where('payment_method', 'Tunai')->sum('total_price');
+        $qrisRevenue = (float) $sales->where('payment_method', 'QRIS')->sum('total_price');
+        $expenseQuery = DailyCapital::query();
+        if ($period === 'hari_ini') {
+            $expenseQuery->whereDate('date', today());
+        } elseif ($period === 'minggu_ini') {
+            $expenseQuery->whereBetween('date', [now()->startOfWeek()->toDateString(), today()->toDateString()]);
+        } elseif ($period === 'bulan_ini') {
+            $expenseQuery->whereMonth('date', now()->month)->whereYear('date', now()->year);
+        }
+        $totalExpenses = (float) $expenseQuery->sum('expenses');
         
         $totalRevenue = $sales->sum('total_price');
         $totalProfit = $sales->sum('profit');
-        $totalTransactions = $sales->count();
+        $totalTransactions = $sales->pluck('invoice_no')->filter()->unique()->count()
+            + $sales->whereNull('invoice_no')->count();
         $averageTransaction = $totalTransactions > 0 ? $totalRevenue / $totalTransactions : 0;
         
         // Daily revenue for chart
@@ -457,6 +471,10 @@ class KasirController extends Controller
             'totalProfit',
             'totalTransactions',
             'averageTransaction',
+            'totalItemsSold',
+            'cashRevenue',
+            'qrisRevenue',
+            'totalExpenses',
             'dailyRevenue',
             'bestDay',
             'salesByCategory',

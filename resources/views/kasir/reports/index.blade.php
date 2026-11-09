@@ -7,9 +7,12 @@
     <!-- SUMMARY CARD + PERIOD FILTER -->
     <div class="bg-kasir-green text-white rounded-3xl p-5 shadow-md mb-5">
         <div class="bg-[#FAF5EE] text-kasir-text rounded-2xl p-4 shadow-xs mb-4">
-            <p class="text-xs text-gray-500 font-medium mb-1">Pendapatan • {{ str_replace('_', ' ', $period) }}</p>
+            @php
+                $periodLabels = ['hari_ini' => 'Hari ini', 'minggu_ini' => 'Minggu ini', 'bulan_ini' => 'Bulan ini', 'semua' => 'Semua'];
+            @endphp
+            <p class="text-xs text-gray-500 font-medium mb-1">Pendapatan • {{ $periodLabels[$period] ?? 'Hari ini' }}</p>
             <p class="text-2xl font-extrabold text-kasir-green mb-3">Rp{{ number_format($totalRevenue, 0, ',', '.') }}</p>
-            <div class="grid grid-cols-3 gap-2 border-t border-kasir-border/60 pt-3">
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 border-t border-kasir-border/60 pt-3">
                 <div>
                     <p class="text-[10px] text-gray-400">Untung</p>
                     <p class="text-sm font-bold text-kasir-green">Rp{{ number_format($totalProfit, 0, ',', '.') }}</p>
@@ -19,17 +22,22 @@
                     <p class="text-sm font-bold text-kasir-text">{{ $totalTransactions }}</p>
                 </div>
                 <div>
-                    <p class="text-[10px] text-gray-400">Rata-rata</p>
+                    <p class="text-[10px] text-gray-400">Rata-rata / transaksi</p>
                     <p class="text-sm font-bold text-kasir-text">Rp{{ number_format($averageTransaction, 0, ',', '.') }}</p>
                 </div>
+                <div><p class="text-[10px] text-gray-400">Item terjual</p><p class="text-sm font-bold text-kasir-text">{{ number_format($totalItemsSold) }}</p></div>
+                <div><p class="text-[10px] text-gray-400">Tunai</p><p class="text-sm font-bold text-kasir-text">Rp{{ number_format($cashRevenue, 0, ',', '.') }}</p></div>
+                <div><p class="text-[10px] text-gray-400">QRIS</p><p class="text-sm font-bold text-kasir-text">Rp{{ number_format($qrisRevenue, 0, ',', '.') }}</p></div>
+                <div><p class="text-[10px] text-gray-400">Pengeluaran</p><p class="text-sm font-bold text-rose-600">Rp{{ number_format($totalExpenses, 0, ',', '.') }}</p></div>
             </div>
         </div>
 
         <!-- Period Tabs -->
-        <div class="flex gap-2">
-            <a href="{{ route('kasir.reports') }}?period=7_hari" class="px-4 py-2 rounded-xl text-xs font-semibold transition {{ $period === '7_hari' ? 'bg-kasir-orange text-kasir-text font-bold shadow-xs' : 'bg-white/10 text-white hover:bg-white/20' }}">7 hari</a>
-            <a href="{{ route('kasir.reports') }}?period=30_hari" class="px-4 py-2 rounded-xl text-xs font-semibold transition {{ $period === '30_hari' ? 'bg-kasir-orange text-kasir-text font-bold shadow-xs' : 'bg-white/10 text-white hover:bg-white/20' }}">30 hari</a>
+        <div class="flex flex-wrap gap-2">
+            <a href="{{ route('kasir.reports') }}?period=hari_ini" class="px-4 py-2 rounded-xl text-xs font-semibold transition {{ $period === 'hari_ini' ? 'bg-kasir-orange text-kasir-text font-bold shadow-xs' : 'bg-white/10 text-white hover:bg-white/20' }}">Hari ini</a>
+            <a href="{{ route('kasir.reports') }}?period=minggu_ini" class="px-4 py-2 rounded-xl text-xs font-semibold transition {{ $period === 'minggu_ini' ? 'bg-kasir-orange text-kasir-text font-bold shadow-xs' : 'bg-white/10 text-white hover:bg-white/20' }}">Minggu ini</a>
             <a href="{{ route('kasir.reports') }}?period=bulan_ini" class="px-4 py-2 rounded-xl text-xs font-semibold transition {{ $period === 'bulan_ini' ? 'bg-kasir-orange text-kasir-text font-bold shadow-xs' : 'bg-white/10 text-white hover:bg-white/20' }}">Bulan ini</a>
+            <a href="{{ route('kasir.reports') }}?period=semua" class="px-4 py-2 rounded-xl text-xs font-semibold transition {{ $period === 'semua' ? 'bg-kasir-orange text-kasir-text font-bold shadow-xs' : 'bg-white/10 text-white hover:bg-white/20' }}">Semua</a>
         </div>
     </div>
 
