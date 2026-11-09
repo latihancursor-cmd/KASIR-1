@@ -52,6 +52,75 @@
         <span x-text="toastMessage"></span>
     </div>
 
+    <!-- Receipt Success Modal -->
+    <div x-show="showReceipt" x-cloak class="fixed inset-0 bg-black/50 z-50 flex items-end md:items-center justify-center p-4" @click.self="closeReceipt()">
+        <div @click.away="closeReceipt()" class="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden" x-transition>
+            <!-- Success Icon -->
+            <div class="flex justify-center pt-8 pb-4">
+                <div class="w-20 h-20 rounded-full bg-kasir-green/10 flex items-center justify-center">
+                    <i class="fa-solid fa-check text-4xl text-kasir-green"></i>
+                </div>
+            </div>
+
+            <!-- Receipt Content -->
+            <div class="px-6 pb-6">
+                <h3 class="text-2xl font-bold text-center text-kasir-text mb-1">Transaksi berhasil</h3>
+                <p class="text-center text-sm text-gray-500 mb-6">
+                    <span x-text="receiptData.invoice_no"></span> • <span x-text="receiptData.payment_method"></span>
+                </p>
+
+                <!-- Items List -->
+                <div class="bg-kasir-bg rounded-2xl p-4 mb-4 max-h-48 overflow-y-auto">
+                    <template x-for="item in receiptData.items" :key="item.name">
+                        <div class="flex items-start justify-between py-2 border-b border-kasir-border last:border-0">
+                            <div class="flex-1">
+                                <p class="font-bold text-sm text-kasir-text" x-text="item.name"></p>
+                                <p class="text-xs text-gray-400">
+                                    <span x-text="item.qty"></span> <span x-text="item.unit"></span> × <span x-text="formatRupiah(item.price)"></span>
+                                </p>
+                            </div>
+                            <p class="font-bold text-sm text-kasir-green ml-3" x-text="formatRupiah(item.subtotal)"></p>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Summary -->
+                <div class="space-y-2 mb-6">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500">Subtotal</span>
+                        <span class="font-semibold" x-text="formatRupiah(receiptData.total)"></span>
+                    </div>
+                    <div class="flex justify-between text-base font-bold pt-2 border-t border-kasir-border">
+                        <span class="text-gray-700">Total</span>
+                        <span class="text-kasir-green" x-text="formatRupiah(receiptData.total)"></span>
+                    </div>
+                    <template x-if="receiptData.payment_method === 'Tunai'">
+                        <div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">Dibayar</span>
+                                <span class="font-semibold" x-text="formatRupiah(receiptData.cash_paid)"></span>
+                            </div>
+                            <div class="flex justify-between text-sm font-bold text-kasir-orange">
+                                <span>Kembalian</span>
+                                <span x-text="formatRupiah(receiptData.change)"></span>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex gap-3">
+                    <button @click="closeReceipt()" class="flex-1 py-3 border border-kasir-border text-gray-700 font-semibold text-sm rounded-xl hover:bg-gray-50 transition">
+                        Selesai
+                    </button>
+                    <button @click="printReceipt()" class="flex-1 py-3 bg-kasir-orange text-white font-bold text-sm rounded-xl hover:bg-kasir-darkOrange transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-print"></i> Cetak Struk
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- CART BOTTOM SHEET (Muncul saat ada item) -->
     <div x-show="cart.length > 0" 
          x-cloak
@@ -151,6 +220,8 @@ function posApp() {
         paymentMethod: 'Tunai',
         isProcessing: false,
         showToast: false,
+        showReceipt: false,
+        receiptData: { invoice_no: '', payment_method: '', total: 0, cash_paid: 0, change: 0, items: [] },
         toastMessage: '',
         toastTimer: null,
         cart: [],
@@ -232,6 +303,116 @@ function posApp() {
             }
         },
 
+        closeReceipt() {
+            this.showReceipt = false;
+        },
+
+        printReceipt() {
+            const printWindow = window.open('', '_blank', 'width=300,height=600');
+            const receipt = this.receiptData;
+            const storeName = '{{ $settings->store_name ?? "KasirNih" }}';
+            const date = new Date().toLocaleString('id-ID');
+            
+            let itemsHTML = '';
+            receipt.items.forEach(item => {
+                itemsHTML += `
+                    <tr>
+                        <td style="padding: 4px 0; font-size: 11px;">${item.name}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0 0 6px 0; font-size: 10px; color: #666;">
+                            ${item.qty} ${item.unit} × ${this.formatRupiah(item.price)}
+                        </td>
+                        <td style="text-align: right; padding: 0 0 6px 0; font-size: 11px; font-weight: bold;">
+                            ${this.formatRupiah(item.subtotal)}
+                        </td>
+                    </tr>
+                `;
+            });
+
+            let changeHTML = '';
+            if (receipt.payment_method === 'Tunai') {
+                changeHTML = `
+                    <tr>
+                        <td style="padding: 3px 0; font-size: 11px;">Dibayar</td>
+                        <td style="text-align: right; font-size: 11px; font-weight: bold;">${this.formatRupiah(receipt.cash_paid)}</td>
+                    </tr>
+                    <tr style="border-top: 1px dashed #ddd;">
+                        <td style="padding: 6px 0 0 0; font-size: 12px; font-weight: bold;">Kembalian</td>
+                        <td style="text-align: right; padding: 6px 0 0 0; font-size: 12px; font-weight: bold; color: #E6A15C;">${this.formatRupiah(receipt.change)}</td>
+                    </tr>
+                `;
+            }
+
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Struk - ${receipt.invoice_no}</title>
+                    <style>
+                        @media print {
+                            @page { margin: 0; size: 58mm auto; }
+                            body { margin: 0; padding: 0; }
+                        }
+                        body {
+                            font-family: 'Courier New', monospace;
+                            width: 58mm;
+                            margin: 0 auto;
+                            padding: 10mm 5mm;
+                            font-size: 11px;
+                            color: #000;
+                        }
+                        .header { text-align: center; margin-bottom: 15px; border-bottom: 2px solid #000; padding-bottom: 10px; }
+                        .header h2 { margin: 0 0 5px 0; font-size: 16px; font-weight: bold; }
+                        .header p { margin: 2px 0; font-size: 9px; color: #555; }
+                        .info { margin: 10px 0; font-size: 10px; }
+                        .info div { display: flex; justify-content: space-between; margin: 3px 0; }
+                        table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+                        .divider { border-top: 1px dashed #999; margin: 10px 0; }
+                        .total-row { border-top: 2px solid #000; padding-top: 8px; }
+                        .footer { text-align: center; margin-top: 15px; padding-top: 10px; border-top: 1px dashed #999; font-size: 9px; color: #666; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h2>${storeName}</h2>
+                        <p>Terima kasih atas kunjungan Anda</p>
+                    </div>
+                    
+                    <div class="info">
+                        <div><span>No. Transaksi</span><span><strong>${receipt.invoice_no}</strong></span></div>
+                        <div><span>Tanggal</span><span>${date}</span></div>
+                        <div><span>Kasir</span><span>{{ Auth::user()->name ?? 'Admin' }}</span></div>
+                        <div><span>Metode</span><span>${receipt.payment_method}</span></div>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <table>
+                        ${itemsHTML}
+                        <tr class="total-row">
+                            <td style="padding: 8px 0 3px 0; font-size: 13px; font-weight: bold;">TOTAL</td>
+                            <td style="text-align: right; padding: 8px 0 3px 0; font-size: 13px; font-weight: bold;">${this.formatRupiah(receipt.total)}</td>
+                        </tr>
+                        ${changeHTML}
+                    </table>
+
+                    <div class="footer">
+                        <p>Barang yang sudah dibeli tidak dapat dikembalikan</p>
+                        <p style="margin-top: 8px;">Powered by KasirNih</p>
+                    </div>
+                </body>
+                </html>
+            `);
+            
+            printWindow.document.close();
+            printWindow.focus();
+            setTimeout(() => {
+                printWindow.print();
+                printWindow.close();
+            }, 250);
+        },
+
         formatRupiah(amount) {
             return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);
         },
@@ -261,9 +442,16 @@ function posApp() {
                 const data = await response.json();
 
                 if (data.success) {
-                    this.showNotification('Transaksi berhasil! Invoice: ' + data.invoice_no);
+                    this.receiptData = {
+                        invoice_no: data.invoice_no,
+                        payment_method: data.payment_method,
+                        total: data.total,
+                        cash_paid: data.cash_paid,
+                        change: data.change,
+                        items: data.items
+                    };
+                    this.showReceipt = true;
                     this.cart = [];
-                    setTimeout(() => window.location.reload(), 1500);
                 } else {
                     this.showNotification(data.message || 'Gagal memproses transaksi.');
                 }

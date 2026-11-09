@@ -400,8 +400,10 @@ class KasirController extends Controller
         ]);
 
         $invoiceNo = 'TRX-' . str_pad(Sale::max('id') + 1, 4, '0', STR_PAD_LEFT);
+        $totalAmount = 0;
+        $itemsDetail = [];
 
-        DB::transaction(function () use ($data, $invoiceNo) {
+        DB::transaction(function () use ($data, $invoiceNo, &$totalAmount, &$itemsDetail) {
             foreach ($data['items'] as $item) {
                 $product = Product::lockForUpdate()->findOrFail($item['product_id']);
                 $qty = $item['quantity'];
@@ -426,13 +428,30 @@ class KasirController extends Controller
                     'profit' => $profit,
                     'payment_method' => $data['payment_method'] ?? 'Tunai',
                 ]);
+
+                $totalAmount += $totalPrice;
+                $itemsDetail[] = [
+                    'name' => $product->name,
+                    'unit' => $product->unit,
+                    'price' => $product->price,
+                    'qty' => $qty,
+                    'subtotal' => $totalPrice,
+                ];
             }
         });
+
+        $cashPaid = $data['cash_paid'] ?? $totalAmount;
+        $change = max(0, $cashPaid - $totalAmount);
 
         return response()->json([
             'success' => true,
             'message' => 'Transaksi berhasil!',
             'invoice_no' => $invoiceNo,
+            'payment_method' => $data['payment_method'] ?? 'Tunai',
+            'total' => $totalAmount,
+            'cash_paid' => $cashPaid,
+            'change' => $change,
+            'items' => $itemsDetail,
         ]);
     }
 }
