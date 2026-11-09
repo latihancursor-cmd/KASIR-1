@@ -1,6 +1,6 @@
 <x-guest-layout>
     <div class="mb-6 text-center">
-        <div class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-700 text-2xl font-extrabold text-white">K</div>
+        <img src="{{ asset('favicon.png') }}" alt="KasirNih Logo" class="mx-auto mb-3 h-14 w-14 object-contain">
         <h1 class="text-2xl font-extrabold text-slate-800">KasirNih</h1>
         <p class="mt-1 text-sm text-slate-500">Masuk ke akun toko Anda</p>
     </div>
@@ -15,14 +15,14 @@
             <div class="grid grid-cols-2 gap-3">
                 <label class="cursor-pointer">
                     <input type="radio" name="role" value="owner" x-model="role" class="peer sr-only">
-                    <span class="flex flex-col items-center gap-2 rounded-xl border border-slate-200 bg-white p-4 text-slate-600 transition peer-checked:border-emerald-700 peer-checked:bg-emerald-50 peer-checked:text-emerald-800">
+                    <span class="flex flex-col items-center gap-2 rounded-xl border border-slate-200 bg-white p-4 text-slate-600 transition peer-checked:border-[#1B0D80] peer-checked:bg-[#E3F2FD] peer-checked:text-[#1B0D80]">
                         <i class="fa-solid fa-store text-xl"></i>
                         <span class="text-sm font-bold">Owner</span>
                     </span>
                 </label>
                 <label class="cursor-pointer">
                     <input type="radio" name="role" value="kasir" x-model="role" class="peer sr-only">
-                    <span class="flex flex-col items-center gap-2 rounded-xl border border-slate-200 bg-white p-4 text-slate-600 transition peer-checked:border-emerald-700 peer-checked:bg-emerald-50 peer-checked:text-emerald-800">
+                    <span class="flex flex-col items-center gap-2 rounded-xl border border-slate-200 bg-white p-4 text-slate-600 transition peer-checked:border-[#1B0D80] peer-checked:bg-[#E3F2FD] peer-checked:text-[#1B0D80]">
                         <i class="fa-solid fa-cash-register text-xl"></i>
                         <span class="text-sm font-bold">Kasir</span>
                     </span>
@@ -45,15 +45,15 @@
 
         <div class="mt-4 flex items-center justify-between">
             <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-emerald-700 shadow-sm focus:ring-emerald-600" name="remember">
+                <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-[#1B0D80] shadow-sm focus:ring-[#54B5C1]" name="remember">
                 <span class="ms-2 text-sm text-gray-600">Ingat saya</span>
             </label>
             @if (Route::has('password.request'))
-                <a class="text-sm text-emerald-700 underline hover:text-emerald-900" href="{{ route('password.request') }}">Lupa password?</a>
+                <a class="text-sm text-[#1B0D80] underline hover:text-[#54B5C1]" href="{{ route('password.request') }}">Lupa password?</a>
             @endif
         </div>
 
-        <button type="submit" class="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-700 px-4 py-3 font-bold text-white transition hover:bg-emerald-800 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:ring-offset-2">
+        <button type="submit" class="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-[#1B0D80] px-4 py-3 font-bold text-white transition hover:bg-[#14095F] focus:outline-none focus:ring-2 focus:ring-[#54B5C1] focus:ring-offset-2">
             <i class="fa-solid fa-right-to-bracket"></i> Masuk
         </button>
     </form>

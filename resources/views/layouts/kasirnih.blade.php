@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
     <title>KasirNih - @yield('title', 'Sistem Kasir')</title>
 
     <!-- Tailwind CSS CDN -->
@@ -69,9 +70,9 @@
                         <h1 class="text-xl font-bold tracking-tight">@yield('page_title')</h1>
                     @else
                         <div class="flex items-center gap-2">
-                            <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center font-bold text-lg">K</div>
+                            <img src="{{ asset('favicon.png') }}" alt="Logo KasirNih" class="w-8 h-8 rounded-lg bg-white object-contain p-0.5">
                             <div>
-                                <p class="text-[11px] text-emerald-100 font-medium">Selamat {{ now()->hour < 12 ? 'pagi' : (now()->hour < 18 ? 'siang' : 'sore') }}</p>
+                                <p class="text-[11px] text-emerald-100 font-medium">Selamat {{ now()->hour < 11 ? 'pagi' : (now()->hour < 15 ? 'siang' : (now()->hour < 18 ? 'sore' : 'malam')) }}</p>
                                 <h1 class="text-base font-extrabold leading-tight">{{ $settings->store_name ?? 'KasirNih' }}</h1>
                             </div>
                         </div>
