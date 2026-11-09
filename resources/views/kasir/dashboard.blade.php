@@ -76,7 +76,11 @@
         <h2 class="text-base font-bold text-kasir-text mb-4 flex items-center gap-2">
             <i class="fa-solid fa-bolt text-kasir-orange"></i> Quick Actions
         </h2>
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+            <button type="button" onclick="document.getElementById('dailyCapitalModal').showModal()" class="flex flex-col items-center justify-center p-4 bg-kasir-bg hover:bg-gray-50 rounded-2xl transition text-center group border border-kasir-border">
+                <div class="w-12 h-12 rounded-xl bg-kasir-green/10 group-hover:bg-kasir-green/20 flex items-center justify-center mb-2 text-kasir-green text-xl transition"><i class="fa-solid fa-vault"></i></div>
+                <span class="text-xs font-semibold text-kasir-text">Modal Harian</span>
+            </button>
             <a href="{{ route('kasir.penjualan') }}" class="flex flex-col items-center justify-center p-4 bg-kasir-bg hover:bg-gray-50 rounded-2xl transition text-center group border border-kasir-border">
                 <div class="w-12 h-12 rounded-xl bg-kasir-green/10 group-hover:bg-kasir-green/20 flex items-center justify-center mb-2 text-kasir-green text-xl transition">
                     <i class="fa-solid fa-cart-plus"></i>
@@ -103,6 +107,62 @@
             </a>
         </div>
     </div>
+
+    <!-- DAILY CAPITAL / CASH CLOSING MODAL -->
+    <dialog id="dailyCapitalModal" class="w-full max-w-xl rounded-3xl p-0 shadow-2xl backdrop:bg-black/50">
+        <div class="bg-white rounded-3xl overflow-hidden">
+            <div class="bg-kasir-green text-white px-6 py-4 flex items-center justify-between">
+                <div>
+                    <h2 class="text-lg font-bold">Modal Harian</h2>
+                    <p class="text-xs text-white/70">{{ now()->format('d M Y') }}</p>
+                </div>
+                <button type="button" onclick="document.getElementById('dailyCapitalModal').close()" class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="p-5 space-y-4 max-h-[75vh] overflow-y-auto">
+                <section class="rounded-2xl border border-kasir-border p-4">
+                    <h3 class="text-xs font-bold uppercase text-kasir-green mb-3"><i class="fa-solid fa-building-columns mr-2"></i>Kas Awal</h3>
+                    <p class="text-xl font-extrabold text-kasir-text">Rp{{ number_format($dailyCapital->initial_capital, 0, ',', '.') }}</p>
+                </section>
+
+                <section class="rounded-2xl border border-kasir-border p-4">
+                    <h3 class="text-xs font-bold uppercase text-kasir-green mb-3"><i class="fa-solid fa-receipt mr-2"></i>Penjualan Hari Ini</h3>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between text-gray-500"><span>Total transaksi</span><span>{{ $todayCount }}x</span></div>
+                        <div class="flex justify-between text-gray-500"><span>Tunai</span><span>Rp{{ number_format($todayCashSales, 0, ',', '.') }}</span></div>
+                        <div class="flex justify-between text-gray-500"><span>QRIS</span><span>Rp{{ number_format($todayQrisSales, 0, ',', '.') }}</span></div>
+                        <div class="flex justify-between font-bold text-kasir-text border-t border-kasir-border pt-2"><span>Total penjualan</span><span>Rp{{ number_format($todayRevenue, 0, ',', '.') }}</span></div>
+                    </div>
+                </section>
+
+                <section class="rounded-2xl border border-kasir-border p-4">
+                    <h3 class="text-xs font-bold uppercase text-rose-600 mb-2"><i class="fa-solid fa-money-bill-transfer mr-2"></i>Pengeluaran</h3>
+                    <p class="text-lg font-bold text-rose-600">Rp{{ number_format($todayExpenses, 0, ',', '.') }}</p>
+                </section>
+
+                <form method="POST" action="{{ route('kasir.daily-capital.update') }}" class="space-y-3">
+                    @csrf
+                    @method('PUT')
+                    <section class="rounded-2xl border border-kasir-border p-4 space-y-3">
+                        <h3 class="text-xs font-bold uppercase text-kasir-green"><i class="fa-solid fa-calculator mr-2"></i>Hitung Fisik Uang</h3>
+                        <p class="text-xs text-gray-500">Hitung uang tunai di laci kasir, lalu masukkan jumlahnya.</p>
+                        <label class="block text-xs font-semibold text-kasir-text" for="initial_capital">Kas awal (Rp)</label>
+                        <input id="initial_capital" name="initial_capital" type="number" min="0" step="1" required value="{{ old('initial_capital', $dailyCapital->initial_capital) }}" class="w-full rounded-xl border border-kasir-border px-3 py-2.5 text-sm focus:ring-2 focus:ring-kasir-green/20 outline-none">
+                        <label class="block text-xs font-semibold text-kasir-text" for="expenses">Pengeluaran hari ini (Rp)</label>
+                        <input id="expenses" name="expenses" type="number" min="0" step="1" required value="{{ old('expenses', $dailyCapital->expenses) }}" class="w-full rounded-xl border border-kasir-border px-3 py-2.5 text-sm focus:ring-2 focus:ring-kasir-green/20 outline-none">
+                        <label class="block text-xs font-semibold text-kasir-text" for="counted_cash">Jumlah uang aktual (Rp)</label>
+                        <input id="counted_cash" name="counted_cash" type="number" min="0" step="1" value="{{ old('counted_cash', $dailyCapital->counted_cash) }}" placeholder="0" class="w-full rounded-xl border border-kasir-border px-3 py-2.5 text-sm focus:ring-2 focus:ring-kasir-green/20 outline-none">
+                        <label class="block text-xs font-semibold text-kasir-text" for="daily_notes">Catatan penutupan (opsional)</label>
+                        <textarea id="daily_notes" name="notes" maxlength="500" rows="3" placeholder="Catatan" class="w-full rounded-xl border border-kasir-border px-3 py-2.5 text-sm focus:ring-2 focus:ring-kasir-green/20 outline-none">{{ old('notes', $dailyCapital->notes) }}</textarea>
+                    </section>
+                    <div class="flex gap-3">
+                        <button type="button" onclick="document.getElementById('dailyCapitalModal').close()" class="flex-1 py-3 rounded-xl border border-kasir-border font-semibold text-sm">Tutup</button>
+                        <button type="submit" class="flex-1 py-3 rounded-xl bg-kasir-orange text-white font-bold text-sm"><i class="fa-solid fa-floppy-disk mr-1"></i> Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </dialog>
 
     <!-- TWO COLUMNS: TRANSAKSI TERBARU & STATUS PRODUK -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">

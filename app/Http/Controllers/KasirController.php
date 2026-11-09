@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\DailyCapital;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\StoreSetting;
@@ -19,9 +20,14 @@ class KasirController extends Controller
         $settings = StoreSetting::getSettings();
         
         $todayRevenue = Sale::whereDate('created_at', today())->sum('total_price');
-        $todayCount = Sale::whereDate('created_at', today())->count();
+        $todayCount = Sale::whereDate('created_at', today())->distinct('invoice_no')->count('invoice_no')
+            + Sale::whereDate('created_at', today())->whereNull('invoice_no')->count();
         $itemsSold = Sale::whereDate('created_at', today())->sum('quantity');
         $todayProfit = Sale::whereDate('created_at', today())->sum('profit');
+        $todayCashSales = Sale::whereDate('created_at', today())->where('payment_method', 'Tunai')->sum('total_price');
+        $todayQrisSales = Sale::whereDate('created_at', today())->where('payment_method', 'QRIS')->sum('total_price');
+        $dailyCapital = DailyCapital::firstOrCreate(['date' => today()->toDateString()]);
+        $todayExpenses = (float) $dailyCapital->expenses;
         
         $lastTransactions = Sale::with('product')
             ->whereDate('created_at', today())
@@ -41,10 +47,29 @@ class KasirController extends Controller
             'todayCount',
             'itemsSold',
             'todayProfit',
+            'todayCashSales',
+            'todayQrisSales',
+            'dailyCapital',
+            'todayExpenses',
             'lastTransactions',
             'lowStockProducts',
             'outOfStockProducts'
         ));
+    }
+
+    public function dailyCapitalUpdate(Request $request)
+    {
+        $validated = $request->validate([
+            'initial_capital' => 'required|numeric|min:0',
+            'expenses' => 'required|numeric|min:0',
+            'counted_cash' => 'nullable|numeric|min:0',
+            'notes' => 'nullable|string|max:500',
+        ]);
+
+        $capital = DailyCapital::firstOrCreate(['date' => today()->toDateString()]);
+        $capital->update($validated);
+
+        return redirect()->route('kasir.beranda')->with('success', 'Modal harian berhasil disimpan!');
     }
 
     // ==================== MANAJEMEN PRODUK ====================
@@ -239,12 +264,36 @@ class KasirController extends Controller
                 break;
         }
         
-        $transactions = $query->latest()->get();
+        $sales = $query->latest()->get();
+        $transactions = $sales->groupBy(function ($sale) {
+            return $sale->invoice_no ?: 'sale-' . $sale->id;
+        })->map(function ($items, $invoiceKey) {
+            $first = $items->first();
+            return [
+                'invoice_no' => $first->invoice_no ?: ('TRX-' . $first->id),
+                'created_at' => $first->created_at,
+                'payment_method' => $first->payment_method ?? 'Tunai',
+                'items' => $items->map(function ($sale) {
+                    return [
+                        'name' => $sale->product->name ?? 'Produk',
+                        'unit' => $sale->product->unit ?? 'pcs',
+                        'qty' => (int) $sale->quantity,
+                        'price' => (float) ($sale->quantity ? $sale->total_price / $sale->quantity : 0),
+                        'subtotal' => (float) $sale->total_price,
+                    ];
+                })->values(),
+                'total' => (float) $items->sum('total_price'),
+                'profit' => (float) $items->sum('profit'),
+                'quantity' => (int) $items->sum('quantity'),
+                'cash_paid' => (float) $items->sum('total_price'),
+                'change' => 0,
+            ];
+        })->values();
         
-        $totalRevenue = $transactions->sum('total_price');
+        $totalRevenue = $sales->sum('total_price');
         $totalTransactions = $transactions->count();
-        $totalItems = $transactions->sum('quantity');
-        $totalProfit = $transactions->sum('profit');
+        $totalItems = $sales->sum('quantity');
+        $totalProfit = $sales->sum('profit');
         
         return view('kasir.history.index', compact(
             'transactions',

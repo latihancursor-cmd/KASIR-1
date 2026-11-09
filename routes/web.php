@@ -34,6 +34,7 @@ Route::middleware(['auth','role:kasir'])->prefix('kasir')->group(function(){
     // Dashboard
     Route::get('/', [App\Http\Controllers\KasirController::class,'beranda'])->name('kasir.beranda');
     Route::get('/beranda', [App\Http\Controllers\KasirController::class,'beranda']);
+    Route::put('/modal-harian', [App\Http\Controllers\KasirController::class,'dailyCapitalUpdate'])->name('kasir.daily-capital.update');
     
     // Penjualan / POS
     Route::get('/penjualan', [App\Http\Controllers\KasirController::class,'pos'])->name('kasir.penjualan');
