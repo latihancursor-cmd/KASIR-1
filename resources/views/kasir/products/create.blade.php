@@ -5,7 +5,7 @@
 @section('back_url', route('kasir.products'))
 
 @section('content')
-    <form method="POST" action="{{ route('kasir.products.store') }}" class="max-w-2xl mx-auto space-y-5">
+    <form method="POST" action="{{ route('kasir.products.store') }}" enctype="multipart/form-data" class="max-w-2xl mx-auto space-y-5" x-data="productCreateForm()">
         @csrf
 
         <!-- Product Identity -->
@@ -23,7 +23,11 @@
             <div class="grid grid-cols-2 gap-3 mb-4">
                 <div>
                     <label for="sku" class="block text-sm font-semibold text-kasir-text mb-2">SKU <span class="text-rose-500">*</span></label>
-                    <input type="text" id="sku" name="sku" value="{{ old('sku') }}" required placeholder="SMB-009" class="w-full px-4 py-3 bg-white rounded-2xl border border-kasir-border focus:ring-2 focus:ring-kasir-green/20 focus:border-kasir-green outline-none text-sm @error('sku') border-rose-400 @enderror">
+                    <div class="relative">
+                        <input type="text" id="sku" name="sku" x-model="sku" value="{{ old('sku') }}" required placeholder="Otomatis dari kategori" class="w-full px-4 py-3 bg-white rounded-2xl border border-kasir-border focus:ring-2 focus:ring-kasir-green/20 focus:border-kasir-green outline-none text-sm @error('sku') border-rose-400 @enderror">
+                        <span x-show="loadingSku" class="absolute right-3 top-1/2 -translate-y-1/2 text-kasir-green"><i class="fa-solid fa-spinner animate-spin text-xs"></i></span>
+                    </div>
+                    <p class="text-[11px] text-gray-400 mt-1">Terisi otomatis sesuai kategori (bisa disesuaikan)</p>
                     @error('sku') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div>
@@ -38,13 +42,22 @@
                     <label for="category_id" class="block text-sm font-semibold text-kasir-text">Kategori <span class="text-rose-500">*</span></label>
                     <a href="{{ route('kasir.settings') }}#kategori" class="text-xs font-semibold text-kasir-green hover:text-kasir-darkGreen"><i class="fa-solid fa-pen-to-square mr-1"></i> Kelola</a>
                 </div>
-                <select id="category_id" name="category_id" required class="w-full px-4 py-3 bg-white rounded-2xl border border-kasir-border focus:ring-2 focus:ring-kasir-green/20 focus:border-kasir-green outline-none text-sm">
+                <select id="category_id" name="category_id" x-model="categoryId" @change="generateSku()" required class="w-full px-4 py-3 bg-white rounded-2xl border border-kasir-border focus:ring-2 focus:ring-kasir-green/20 focus:border-kasir-green outline-none text-sm">
                     <option value="">Pilih kategori</option>
                     @foreach($categories as $category)
-                    <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                    <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>{{ $category->name }} ({{ $category->code ?: strtoupper(substr(preg_replace('/[^A-Za-z]/', '', $category->name), 0, 3)) }})</option>
                     @endforeach
                 </select>
                 @error('category_id') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
+            </div>
+
+            <!-- Product Image -->
+            <div class="mb-4" x-data="{ preview: null }">
+                <label for="image" class="block text-sm font-semibold text-kasir-text mb-2">Gambar produk</label>
+                <input type="file" id="image" name="image" accept="image/jpeg,image/png,image/webp" @change="preview = URL.createObjectURL($event.target.files[0])" class="w-full px-4 py-3 bg-white rounded-2xl border border-kasir-border text-sm">
+                <p class="text-xs text-gray-400 mt-1">JPG, PNG, atau WebP. Maksimal 2 MB.</p>
+                <img x-show="preview" :src="preview" alt="Preview gambar produk" class="mt-3 h-32 w-32 rounded-xl object-cover border border-kasir-border">
+                @error('image') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
             </div>
 
             <!-- Description -->
@@ -122,4 +135,36 @@
             </button>
         </div>
     </form>
+
+    <script>
+    function productCreateForm() {
+        return {
+            categoryId: '{{ old('category_id') }}',
+            sku: '{{ old('sku') }}',
+            loadingSku: false,
+            init() {
+                if (this.categoryId && !this.sku) {
+                    this.generateSku();
+                }
+            },
+            async generateSku() {
+                if (!this.categoryId) {
+                    return;
+                }
+                this.loadingSku = true;
+                try {
+                    const response = await fetch(`{{ route('kasir.products.sku') }}?category_id=${this.categoryId}`);
+                    const data = await response.json();
+                    if (data.sku) {
+                        this.sku = data.sku;
+                    }
+                } catch (e) {
+                    console.error(e);
+                } finally {
+                    this.loadingSku = false;
+                }
+            }
+        }
+    }
+    </script>
 @endsection

@@ -39,8 +39,12 @@
             <div class="flex items-start justify-between gap-3">
                 <!-- Product Icon & Info -->
                 <div class="flex items-start gap-3 flex-1 min-w-0">
-                    <div class="w-12 h-12 rounded-xl bg-kasir-green/10 flex items-center justify-center text-kasir-green shrink-0">
-                        <i class="fa-solid fa-box"></i>
+                    <div class="w-12 h-12 rounded-xl bg-kasir-green/10 flex items-center justify-center text-kasir-green shrink-0 overflow-hidden">
+                        @if($product->image)
+                            <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
+                        @else
+                            <i class="fa-solid fa-box"></i>
+                        @endif
                     </div>
                     <div class="flex-1 min-w-0">
                         <h3 class="font-bold text-base text-kasir-text mb-0.5 truncate">{{ $product->name }}</h3>

@@ -5,7 +5,7 @@
 @section('back_url', route('kasir.products'))
 
 @section('content')
-    <form method="POST" action="{{ route('kasir.products.update', $product) }}" class="max-w-2xl mx-auto space-y-5">
+    <form method="POST" action="{{ route('kasir.products.update', $product) }}" enctype="multipart/form-data" class="max-w-2xl mx-auto space-y-5">
         @csrf
         @method('PUT')
 
@@ -39,6 +39,14 @@
                     <option value="{{ $category->id }}" {{ old('category_id', $product->category_id) == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
                     @endforeach
                 </select>
+            </div>
+
+            <div class="mb-4" x-data="{ preview: '{{ $product->image ? asset('storage/' . $product->image) : '' }}' }">
+                <label for="image" class="block text-sm font-semibold text-kasir-text mb-2">Gambar produk</label>
+                <input type="file" id="image" name="image" accept="image/jpeg,image/png,image/webp" @change="preview = URL.createObjectURL($event.target.files[0])" class="w-full px-4 py-3 bg-white rounded-2xl border border-kasir-border text-sm">
+                <p class="text-xs text-gray-400 mt-1">Kosongkan jika tidak ingin mengubah gambar.</p>
+                <template x-if="preview"><img :src="preview" alt="Preview gambar produk" class="mt-3 h-32 w-32 rounded-xl object-cover border border-kasir-border"></template>
+                @error('image') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
             </div>
 
             <div>

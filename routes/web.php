@@ -43,6 +43,7 @@ Route::middleware(['auth','role:kasir'])->prefix('kasir')->group(function(){
     Route::get('/produk', [App\Http\Controllers\KasirController::class,'products'])->name('kasir.products');
     Route::get('/produk/tambah', [App\Http\Controllers\KasirController::class,'productCreate'])->name('kasir.products.create');
     Route::post('/produk', [App\Http\Controllers\KasirController::class,'productStore'])->name('kasir.products.store');
+    Route::get('/produk/sku', [App\Http\Controllers\KasirController::class,'generateProductSku'])->name('kasir.products.sku');
     Route::get('/produk/{product}/edit', [App\Http\Controllers\KasirController::class,'productEdit'])->name('kasir.products.edit');
     Route::put('/produk/{product}', [App\Http\Controllers\KasirController::class,'productUpdate'])->name('kasir.products.update');
     Route::delete('/produk/{product}', [App\Http\Controllers\KasirController::class,'productDestroy'])->name('kasir.products.destroy');

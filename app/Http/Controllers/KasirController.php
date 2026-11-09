@@ -9,6 +9,7 @@ use App\Models\StoreSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class KasirController extends Controller
 {
@@ -76,12 +77,26 @@ class KasirController extends Controller
         return view('kasir.products.create', compact('categories'));
     }
 
+    public function generateProductSku(Request $request)
+    {
+        $request->validate(['category_id' => 'required|exists:categories,id']);
+
+        return response()->json([
+            'sku' => Product::generateSku($request->category_id),
+        ]);
+    }
+
     public function productStore(Request $request)
     {
+        if (empty($request->sku) && $request->filled('category_id')) {
+            $request->merge(['sku' => Product::generateSku($request->category_id)]);
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'sku' => 'required|string|max:50|unique:products,sku',
             'barcode' => 'nullable|string|max:100',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'category_id' => 'required|exists:categories,id',
             'description' => 'nullable|string',
             'cost_price' => 'required|numeric|min:0',
@@ -93,6 +108,11 @@ class KasirController extends Controller
         ]);
 
         $validated['is_active'] = $request->has('is_active');
+        unset($validated['image']);
+
+        if ($request->hasFile('image')) {
+            $validated['image'] = $request->file('image')->store('products', 'public');
+        }
 
         Product::create($validated);
 
@@ -111,6 +131,7 @@ class KasirController extends Controller
             'name' => 'required|string|max:255',
             'sku' => 'required|string|max:50|unique:products,sku,' . $product->id,
             'barcode' => 'nullable|string|max:100',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'category_id' => 'required|exists:categories,id',
             'description' => 'nullable|string',
             'cost_price' => 'required|numeric|min:0',
@@ -123,6 +144,15 @@ class KasirController extends Controller
 
         $validated['is_active'] = $request->has('is_active');
 
+        if ($request->hasFile('image')) {
+            if ($product->image && Storage::disk('public')->exists($product->image)) {
+                Storage::disk('public')->delete($product->image);
+            }
+            $validated['image'] = $request->file('image')->store('products', 'public');
+        } else {
+            unset($validated['image']);
+        }
+
         $product->update($validated);
 
         return redirect()->route('kasir.products')->with('success', 'Produk berhasil diperbarui!');
@@ -130,6 +160,9 @@ class KasirController extends Controller
 
     public function productDestroy(Product $product)
     {
+        if ($product->image && Storage::disk('public')->exists($product->image)) {
+            Storage::disk('public')->delete($product->image);
+        }
         $product->delete();
         return redirect()->route('kasir.products')->with('success', 'Produk berhasil dihapus!');
     }
@@ -382,7 +415,11 @@ class KasirController extends Controller
         $products = Product::with('category')
             ->where('is_active', true)
             ->where('stock', '>', 0)
-            ->get();
+            ->get()
+            ->map(function ($product) {
+                $product->image_url = $product->image ? asset('storage/' . $product->image) : null;
+                return $product;
+            });
         
         $categories = Category::all();
         $settings = StoreSetting::getSettings();
