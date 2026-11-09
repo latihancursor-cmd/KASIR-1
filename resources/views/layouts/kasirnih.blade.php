@@ -89,29 +89,39 @@
                     <a href="{{ route('kasir.penjualan') }}" class="px-3 py-1.5 rounded-lg text-xs font-semibold {{ request()->routeIs('kasir.penjualan') ? 'bg-white text-kasir-green shadow-xs' : 'text-emerald-100 hover:text-white' }}">
                         <i class="fa-solid fa-cart-shopping mr-1"></i> Penjualan
                     </a>
-                    <a href="{{ route('kasir.products') }}" class="px-3 py-1.5 rounded-lg text-xs font-semibold {{ request()->routeIs('kasir.products*') || request()->routeIs('kasir.stock*') ? 'bg-white text-kasir-green shadow-xs' : 'text-emerald-100 hover:text-white' }}">
-                        <i class="fa-solid fa-box mr-1"></i> Produk
-                    </a>
+                    @if(auth()->user()?->hasRole('owner'))
+                    <a href="{{ route('kasir.products') }}" class="px-3 py-1.5 rounded-lg text-xs font-semibold {{ request()->routeIs('kasir.products*') || request()->routeIs('kasir.stock*') ? 'bg-white text-kasir-green shadow-xs' : 'text-emerald-100 hover:text-white' }}"><i class="fa-solid fa-box mr-1"></i> Produk</a>
+                    @else
+                    <span title="Khusus owner" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-emerald-100/50 cursor-not-allowed"><i class="fa-solid fa-box mr-1"></i> Produk <i class="fa-solid fa-lock ml-1 text-[9px]"></i></span>
+                    @endif
                     <a href="{{ route('kasir.history') }}" class="px-3 py-1.5 rounded-lg text-xs font-semibold {{ request()->routeIs('kasir.history') ? 'bg-white text-kasir-green shadow-xs' : 'text-emerald-100 hover:text-white' }}">
                         <i class="fa-solid fa-receipt mr-1"></i> Riwayat
                     </a>
-                    <a href="{{ route('kasir.reports') }}" class="px-3 py-1.5 rounded-lg text-xs font-semibold {{ request()->routeIs('kasir.reports') ? 'bg-white text-kasir-green shadow-xs' : 'text-emerald-100 hover:text-white' }}">
-                        <i class="fa-solid fa-chart-pie mr-1"></i> Laporan
-                    </a>
+                    @if(auth()->user()?->hasRole('owner'))
+                    <a href="{{ route('kasir.reports') }}" class="px-3 py-1.5 rounded-lg text-xs font-semibold {{ request()->routeIs('kasir.reports') ? 'bg-white text-kasir-green shadow-xs' : 'text-emerald-100 hover:text-white' }}"><i class="fa-solid fa-chart-pie mr-1"></i> Laporan</a>
+                    @else
+                    <span title="Khusus owner" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-emerald-100/50 cursor-not-allowed"><i class="fa-solid fa-chart-pie mr-1"></i> Laporan <i class="fa-solid fa-lock ml-1 text-[9px]"></i></span>
+                    @endif
                 </nav>
 
                 <!-- Quick Buttons: Settings & Notifications -->
-                <a href="{{ route('kasir.settings') }}" class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition relative">
-                    <i class="fa-solid fa-gear"></i>
-                </a>
+                @if(auth()->user()?->hasRole('owner'))
+                <a href="{{ route('kasir.settings') }}" class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition relative" title="Pengaturan"><i class="fa-solid fa-gear"></i></a>
+                @else
+                <span class="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center text-white/40 cursor-not-allowed" title="Pengaturan khusus owner"><i class="fa-solid fa-gear"></i><i class="fa-solid fa-lock absolute text-[8px] mt-5 ml-5"></i></span>
+                @endif
                 
                 <!-- Reminder Closing Bell -->
-                <button onclick="checkClosingStatus()" class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition relative">
+                <button onclick="checkClosingStatus()" class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition relative" title="Pengingat tutup kasir">
                     <i class="fa-solid fa-bell"></i>
-                    @if(isset($settings) && $settings->closing_reminder)
-                        <span class="w-2.5 h-2.5 rounded-full bg-kasir-orange absolute top-1 right-1"></span>
-                    @endif
+                    @if(isset($settings) && $settings->closing_reminder)<span class="w-2.5 h-2.5 rounded-full bg-kasir-orange absolute top-1 right-1"></span>@endif
                 </button>
+                <form method="POST" action="{{ route('logout') }}" class="hidden sm:block">
+                    @csrf
+                    <button type="submit" class="h-9 px-3 rounded-xl bg-white/10 hover:bg-rose-500 text-white text-xs font-semibold transition flex items-center gap-2" title="Keluar">
+                        <i class="fa-solid fa-right-from-bracket"></i><span>Keluar</span>
+                    </button>
+                </form>
             </div>
         </div>
     </header>
@@ -148,7 +158,7 @@
 
     <!-- BOTTOM NAVIGATION (khusus Tampilan Mobile) -->
     <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-kasir-border z-40 md:hidden shadow-lg">
-        <div class="grid grid-cols-5 h-16">
+        <div class="grid {{ auth()->user()?->hasRole('owner') ? 'grid-cols-6' : 'grid-cols-4' }} h-16">
             <a href="{{ route('kasir.beranda') }}" class="flex flex-col items-center justify-center transition {{ request()->routeIs('kasir.beranda') ? 'text-kasir-green font-bold' : 'text-gray-400 hover:text-gray-600' }}">
                 <div class="{{ request()->routeIs('kasir.beranda') ? 'bg-kasir-green text-white w-10 h-10 rounded-2xl flex items-center justify-center shadow-xs' : '' }}">
                     <i class="fa-solid fa-house text-lg"></i>
@@ -163,12 +173,11 @@
                 <span class="text-[10px] mt-0.5">Penjualan</span>
             </a>
 
-            <a href="{{ route('kasir.stock') }}" class="flex flex-col items-center justify-center transition {{ request()->routeIs('kasir.stock*') || request()->routeIs('kasir.products*') ? 'text-kasir-green font-bold' : 'text-gray-400 hover:text-gray-600' }}">
-                <div class="{{ request()->routeIs('kasir.stock*') || request()->routeIs('kasir.products*') ? 'bg-kasir-green text-white w-10 h-10 rounded-2xl flex items-center justify-center shadow-xs' : '' }}">
-                    <i class="fa-solid fa-box text-lg"></i>
-                </div>
-                <span class="text-[10px] mt-0.5">Stok</span>
-            </a>
+            @if(auth()->user()?->hasRole('owner'))
+            <a href="{{ route('kasir.stock') }}" class="flex flex-col items-center justify-center transition {{ request()->routeIs('kasir.stock*') || request()->routeIs('kasir.products*') ? 'text-kasir-green font-bold' : 'text-gray-400 hover:text-gray-600' }}"><div class="{{ request()->routeIs('kasir.stock*') || request()->routeIs('kasir.products*') ? 'bg-kasir-green text-white w-10 h-10 rounded-2xl flex items-center justify-center shadow-xs' : '' }}"><i class="fa-solid fa-box text-lg"></i></div><span class="text-[10px] mt-0.5">Stok</span></a>
+            @else
+            <span class="flex flex-col items-center justify-center text-gray-300 cursor-not-allowed" title="Khusus owner"><i class="fa-solid fa-box text-lg"></i><span class="text-[10px] mt-0.5">Stok <i class="fa-solid fa-lock text-[8px]"></i></span></span>
+            @endif
 
             <a href="{{ route('kasir.history') }}" class="flex flex-col items-center justify-center transition {{ request()->routeIs('kasir.history') ? 'text-kasir-green font-bold' : 'text-gray-400 hover:text-gray-600' }}">
                 <div class="{{ request()->routeIs('kasir.history') ? 'bg-kasir-green text-white w-10 h-10 rounded-2xl flex items-center justify-center shadow-xs' : '' }}">
@@ -177,12 +186,19 @@
                 <span class="text-[10px] mt-0.5">Riwayat</span>
             </a>
 
-            <a href="{{ route('kasir.reports') }}" class="flex flex-col items-center justify-center transition {{ request()->routeIs('kasir.reports') ? 'text-kasir-green font-bold' : 'text-gray-400 hover:text-gray-600' }}">
-                <div class="{{ request()->routeIs('kasir.reports') ? 'bg-kasir-green text-white w-10 h-10 rounded-2xl flex items-center justify-center shadow-xs' : '' }}">
-                    <i class="fa-solid fa-chart-simple text-lg"></i>
-                </div>
-                <span class="text-[10px] mt-0.5">Laporan</span>
-            </a>
+            @if(auth()->user()?->hasRole('owner'))
+            <a href="{{ route('kasir.reports') }}" class="flex flex-col items-center justify-center transition {{ request()->routeIs('kasir.reports') ? 'text-kasir-green font-bold' : 'text-gray-400 hover:text-gray-600' }}"><div class="{{ request()->routeIs('kasir.reports') ? 'bg-kasir-green text-white w-10 h-10 rounded-2xl flex items-center justify-center shadow-xs' : '' }}"><i class="fa-solid fa-chart-simple text-lg"></i></div><span class="text-[10px] mt-0.5">Laporan</span></a>
+            @else
+            <span class="flex flex-col items-center justify-center text-gray-300 cursor-not-allowed" title="Khusus owner"><i class="fa-solid fa-chart-simple text-lg"></i><span class="text-[10px] mt-0.5">Laporan <i class="fa-solid fa-lock text-[8px]"></i></span></span>
+            @endif
+
+            <form method="POST" action="{{ route('logout') }}" class="flex flex-col items-center justify-center">
+                @csrf
+                <button type="submit" class="flex flex-col items-center justify-center text-gray-400 hover:text-rose-600 transition" aria-label="Keluar">
+                    <i class="fa-solid fa-right-from-bracket text-lg"></i>
+                    <span class="text-[10px] mt-0.5">Keluar</span>
+                </button>
+            </form>
         </div>
     </div>
 

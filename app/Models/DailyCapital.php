@@ -18,7 +18,6 @@ class DailyCapital extends Model
     ];
 
     protected $casts = [
-        'date' => 'date',
         'initial_capital' => 'decimal:2',
         'expenses' => 'decimal:2',
         'counted_cash' => 'decimal:2',

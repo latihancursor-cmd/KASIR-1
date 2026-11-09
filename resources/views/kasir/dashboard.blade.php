@@ -87,24 +87,30 @@
                 </div>
                 <span class="text-xs font-semibold text-kasir-text">Buat Transaksi</span>
             </a>
+            @if(auth()->user()?->hasRole('owner'))
             <a href="{{ route('kasir.products.create') }}" class="flex flex-col items-center justify-center p-4 bg-kasir-bg hover:bg-gray-50 rounded-2xl transition text-center group border border-kasir-border">
-                <div class="w-12 h-12 rounded-xl bg-blue-500/10 group-hover:bg-blue-500/20 flex items-center justify-center mb-2 text-blue-600 text-xl transition">
-                    <i class="fa-solid fa-boxes-stacked"></i>
-                </div>
-                <span class="text-xs font-semibold text-kasir-text">Tambah Produk</span>
-            </a>
+            @else
+            <div aria-disabled="true" title="Khusus owner" class="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-2xl text-center border border-kasir-border opacity-60 cursor-not-allowed">
+            @endif
+                <div class="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center mb-2 text-blue-600 text-xl"><i class="fa-solid fa-boxes-stacked"></i></div>
+                <span class="text-xs font-semibold text-kasir-text">Tambah Produk @if(auth()->user()?->hasRole('kasir'))<i class="fa-solid fa-lock text-[9px]"></i>@endif</span>
+            @if(auth()->user()?->hasRole('owner'))</a>@else</div>@endif
+            @if(auth()->user()?->hasRole('owner'))
             <a href="{{ route('kasir.stock') }}" class="flex flex-col items-center justify-center p-4 bg-kasir-bg hover:bg-gray-50 rounded-2xl transition text-center group border border-kasir-border">
-                <div class="w-12 h-12 rounded-xl bg-amber-500/10 group-hover:bg-amber-500/20 flex items-center justify-center mb-2 text-amber-600 text-xl transition">
-                    <i class="fa-solid fa-arrow-up-arrow-down"></i>
-                </div>
-                <span class="text-xs font-semibold text-kasir-text">Atur Stok</span>
-            </a>
+            @else
+            <div aria-disabled="true" title="Khusus owner" class="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-2xl text-center border border-kasir-border opacity-60 cursor-not-allowed">
+            @endif
+                <div class="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center mb-2 text-amber-600 text-xl"><i class="fa-solid fa-arrow-up-arrow-down"></i></div>
+                <span class="text-xs font-semibold text-kasir-text">Atur Stok @if(auth()->user()?->hasRole('kasir'))<i class="fa-solid fa-lock text-[9px]"></i>@endif</span>
+            @if(auth()->user()?->hasRole('owner'))</a>@else</div>@endif
+            @if(auth()->user()?->hasRole('owner'))
             <a href="{{ route('kasir.reports') }}" class="flex flex-col items-center justify-center p-4 bg-kasir-bg hover:bg-gray-50 rounded-2xl transition text-center group border border-kasir-border">
-                <div class="w-12 h-12 rounded-xl bg-purple-500/10 group-hover:bg-purple-500/20 flex items-center justify-center mb-2 text-purple-600 text-xl transition">
-                    <i class="fa-solid fa-chart-simple"></i>
-                </div>
-                <span class="text-xs font-semibold text-kasir-text">Lihat Laporan</span>
-            </a>
+            @else
+            <div aria-disabled="true" title="Khusus owner" class="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-2xl text-center border border-kasir-border opacity-60 cursor-not-allowed">
+            @endif
+                <div class="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center mb-2 text-purple-600 text-xl"><i class="fa-solid fa-chart-simple"></i></div>
+                <span class="text-xs font-semibold text-kasir-text">Lihat Laporan @if(auth()->user()?->hasRole('kasir'))<i class="fa-solid fa-lock text-[9px]"></i>@endif</span>
+            @if(auth()->user()?->hasRole('owner'))</a>@else</div>@endif
         </div>
     </div>
 
@@ -164,6 +170,7 @@
         </div>
     </dialog>
 
+    @if(auth()->user()?->hasRole('owner'))
     <!-- TWO COLUMNS: TRANSAKSI TERBARU & STATUS PRODUK -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <!-- TRANSAKSI TERBARU -->
@@ -279,4 +286,5 @@
             </div>
         </div>
     </div>
+    @endif
 @endsection

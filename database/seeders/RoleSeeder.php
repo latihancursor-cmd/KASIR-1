@@ -11,18 +11,18 @@ class RoleSeeder extends Seeder
 {
     public function run()
     {
-        $adminRole = Role::firstOrCreate(['name' => 'admin']);
+        $ownerRole = Role::firstOrCreate(['name' => 'owner']);
         $kasirRole = Role::firstOrCreate(['name' => 'kasir']);
 
-        // Buat Akun Admin
+        // Buat Akun Owner
         $admin = User::firstOrCreate([
             'email' => 'admin@pos.test'
         ], [
             'name' => 'Administrator',
             'password' => Hash::make('secret123'),
         ]);
-        if (!$admin->hasRole('admin')) {
-            $admin->roles()->attach($adminRole);
+        if (!$admin->hasRole('owner')) {
+            $admin->roles()->attach($ownerRole);
         }
 
         // Buat Akun Kasir

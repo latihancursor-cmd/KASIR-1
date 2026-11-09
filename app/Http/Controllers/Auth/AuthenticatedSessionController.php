@@ -28,7 +28,19 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended('/kasir');
+        $user = $request->user();
+
+        if ($user->hasRole('owner') || $user->hasRole('kasir')) {
+            return redirect()->route('kasir.beranda');
+        }
+
+        Auth::guard('web')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('login')->withErrors([
+            'email' => 'Akun tidak memiliki role yang diizinkan.',
+        ]);
     }
 
     /**
@@ -42,6 +54,6 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect()->route('login');
     }
 }

@@ -26,7 +26,13 @@ class KasirController extends Controller
         $todayProfit = Sale::whereDate('created_at', today())->sum('profit');
         $todayCashSales = Sale::whereDate('created_at', today())->where('payment_method', 'Tunai')->sum('total_price');
         $todayQrisSales = Sale::whereDate('created_at', today())->where('payment_method', 'QRIS')->sum('total_price');
-        $dailyCapital = DailyCapital::firstOrCreate(['date' => today()->toDateString()]);
+        $todayDate = today()->format('Y-m-d');
+        $dailyCapital = DailyCapital::whereDate('date', $todayDate)->first()
+            ?? new DailyCapital([
+                'date' => $todayDate,
+                'initial_capital' => 0,
+                'expenses' => 0,
+            ]);
         $todayExpenses = (float) $dailyCapital->expenses;
         
         $lastTransactions = Sale::with('product')
@@ -66,8 +72,13 @@ class KasirController extends Controller
             'notes' => 'nullable|string|max:500',
         ]);
 
-        $capital = DailyCapital::firstOrCreate(['date' => today()->toDateString()]);
-        $capital->update($validated);
+        $todayDate = today()->format('Y-m-d');
+        $capital = DailyCapital::whereDate('date', $todayDate)->first();
+        if (!$capital) {
+            $capital = new DailyCapital(['date' => $todayDate]);
+        }
+        $capital->fill($validated);
+        $capital->save();
 
         return redirect()->route('kasir.beranda')->with('success', 'Modal harian berhasil disimpan!');
     }

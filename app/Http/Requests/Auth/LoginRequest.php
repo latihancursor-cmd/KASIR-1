@@ -30,6 +30,7 @@ class LoginRequest extends FormRequest
         return [
             'email' => ['required', 'string', 'email'],
             'password' => ['required', 'string'],
+            'role' => ['required', 'in:owner,kasir'],
         ];
     }
 
@@ -47,6 +48,14 @@ class LoginRequest extends FormRequest
 
             throw ValidationException::withMessages([
                 'email' => trans('auth.failed'),
+            ]);
+        }
+
+        if (!$this->user()?->hasRole($this->input('role'))) {
+            Auth::logout();
+
+            throw ValidationException::withMessages([
+                'role' => 'Akun tidak memiliki akses untuk role yang dipilih.',
             ]);
         }
 

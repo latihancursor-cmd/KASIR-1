@@ -7,9 +7,17 @@ use Illuminate\Http\Request;
 
 class CheckRole
 {
-    public function handle(Request $request, Closure $next, $role)
+    public function handle(Request $request, Closure $next, ...$roles)
     {
-        if (! $request->user() || ! $request->user()->hasRole($role)) {
+        $allowedRoles = collect($roles)
+            ->flatMap(fn ($role) => explode(',', $role))
+            ->map(fn ($role) => trim($role));
+
+        $hasAllowedRole = $request->user() && $allowedRoles->contains(
+            fn ($allowedRole) => $request->user()->hasRole($allowedRole)
+        );
+
+        if (! $hasAllowedRole) {
             abort(403, 'Forbidden');
         }
         return $next($request);

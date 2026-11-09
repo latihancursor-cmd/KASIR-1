@@ -92,7 +92,10 @@
                         <div class="flex justify-between text-sm"><span class="text-gray-500">Dibayar</span><span class="font-semibold" x-text="formatRupiah(receipt.cash_paid)"></span></div>
                         <div class="flex justify-between text-sm font-bold text-kasir-orange"><span>Kembalian</span><span x-text="formatRupiah(receipt.change)"></span></div>
                     </div>
-                    <button @click="showReceipt = false" class="w-full py-3 border border-kasir-border text-gray-700 font-semibold text-sm rounded-xl hover:bg-gray-50 transition">Selesai</button>
+                    <div class="flex gap-3">
+                        <button @click="showReceipt = false" class="flex-1 py-3 border border-kasir-border text-gray-700 font-semibold text-sm rounded-xl hover:bg-gray-50 transition">Selesai</button>
+                        <button @click="printReceipt()" class="flex-1 py-3 bg-kasir-orange text-white font-bold text-sm rounded-xl hover:bg-kasir-darkOrange transition flex items-center justify-center gap-2"><i class="fa-solid fa-print"></i> Cetak Struk</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -109,6 +112,30 @@
                 },
                 formatRupiah(amount) {
                     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount || 0);
+                },
+                printReceipt() {
+                    const receipt = this.receipt;
+                    const printWindow = window.open('', '_blank', 'width=320,height=640');
+                    const items = (receipt.items || []).map(item => `
+                        <tr><td style="padding:4px 0;font-size:11px;">${item.name}</td></tr>
+                        <tr>
+                            <td style="padding:0 0 6px;font-size:10px;color:#666;">${item.qty} ${item.unit} × ${this.formatRupiah(item.price)}</td>
+                            <td style="text-align:right;padding:0 0 6px;font-size:11px;font-weight:bold;">${this.formatRupiah(item.subtotal)}</td>
+                        </tr>`).join('');
+                    const cash = receipt.payment_method === 'Tunai' ? `
+                        <tr><td style="padding:3px 0;font-size:11px;">Dibayar</td><td style="text-align:right;font-size:11px;font-weight:bold;">${this.formatRupiah(receipt.cash_paid)}</td></tr>
+                        <tr><td style="padding-top:6px;font-size:12px;font-weight:bold;">Kembalian</td><td style="text-align:right;padding-top:6px;font-size:12px;font-weight:bold;">${this.formatRupiah(receipt.change)}</td></tr>` : '';
+                    printWindow.document.write(`<!DOCTYPE html><html><head><title>Struk - ${receipt.invoice_no}</title>
+                        <style>@media print{@page{margin:0;size:58mm auto}body{margin:0}}body{font-family:'Courier New',monospace;width:58mm;margin:0 auto;padding:10mm 5mm;color:#000}table{width:100%;border-collapse:collapse}.header{text-align:center;border-bottom:2px solid #000;padding-bottom:8px}.info{margin:8px 0;font-size:10px}.info div{display:flex;justify-content:space-between;margin:3px 0}.footer{text-align:center;border-top:1px dashed #999;margin-top:12px;padding-top:8px;font-size:9px}</style></head>
+                        <body>
+                            <div class="header"><h2 style="margin:0;font-size:16px;">{{ $settings->store_name ?? 'KasirNih' }}</h2><p style="font-size:9px;">Terima kasih atas kunjungan Anda</p></div>
+                            <div class="info"><div><span>No. Transaksi</span><strong>${receipt.invoice_no}</strong></div><div><span>Tanggal</span><span>${receipt.created_at}</span></div><div><span>Metode</span><span>${receipt.payment_method}</span></div></div>
+                            <table>${items}<tr style="border-top:2px solid #000"><td style="padding-top:8px;font-weight:bold;">TOTAL</td><td style="text-align:right;padding-top:8px;font-weight:bold;">${this.formatRupiah(receipt.total)}</td></tr>${cash}</table>
+                            <div class="footer"><p>Barang yang sudah dibeli tidak dapat dikembalikan</p><p>Powered by KasirNih</p></div>
+                        </body></html>`);
+                    printWindow.document.close();
+                    printWindow.focus();
+                    setTimeout(() => { printWindow.print(); printWindow.close(); }, 250);
                 }
             };
         }
