@@ -1,0 +1,11 @@
+[phases.setup]
+nixPkgs = ["php82", "php82Extensions.pdo_mysql", "php82Extensions.mbstring", "php82Extensions.xml", "php82Extensions.curl", "php82Extensions.zip", "php82Extensions.gd", "php82Extensions.bcmath", "php82Extensions.fileinfo", "php82Extensions.tokenizer", "nodejs_20", "npm-10_x"]
+
+[phases.install]
+cmds = ["composer install --no-dev --optimize-autoloader --no-interaction", "npm ci && npm run build"]
+
+[phases.build]
+cmds = ["php artisan package:discover --ansi"]
+
+[start]
+cmd = "php artisan migrate --force && (php artisan storage:link || true) && php artisan serve --host=0.0.0.0 --port=${PORT:-8080}"
