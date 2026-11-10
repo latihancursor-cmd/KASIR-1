@@ -39,7 +39,7 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerateToken();
 
         return redirect()->route('login')->withErrors([
-            'email' => 'Akun tidak memiliki role yang diizinkan.',
+            'email' => 'Akun ini belum diberi role owner atau kasir. Hubungi administrator.',
         ]);
     }
 
