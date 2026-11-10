@@ -126,7 +126,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <h1 class="text-2xl font-bold text-[#3A2B22] mb-1">
-                            Selamat {{ now()->hour < 12 ? 'Pagi' : (now()->hour < 18 ? 'Siang' : 'Malam') }}, {{ Auth::user()->name }}!
+                            Selamat {{ now()->setTimezone('Asia/Jakarta')->hour < 11 ? 'Pagi' : (now()->setTimezone('Asia/Jakarta')->hour < 15 ? 'Siang' : (now()->setTimezone('Asia/Jakarta')->hour < 18 ? 'Sore' : 'Malam')) }}, {{ Auth::user()->name }}!
                         </h1>
                         <p class="text-sm text-gray-500">Dashboard Kasir Purr'Coffee - {{ now()->translatedFormat('l, d F Y') }}</p>
                     </div>
