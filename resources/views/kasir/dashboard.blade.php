@@ -100,7 +100,7 @@
             @else
             <div aria-disabled="true" title="Khusus owner" class="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-2xl text-center border border-kasir-border opacity-60 cursor-not-allowed">
             @endif
-                <div class="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center mb-2 text-amber-600 text-xl"><i class="fa-solid fa-arrow-up-arrow-down"></i></div>
+                <div class="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center mb-2 text-amber-600 text-xl"><i class="fa-solid fa-arrow-up"></i><i class="fa-solid fa-arrow-down"></i></div>
                 <span class="text-xs font-semibold text-kasir-text">Atur Stok @if(auth()->user()?->hasRole('kasir'))<i class="fa-solid fa-lock text-[9px]"></i>@endif</span>
             @if(auth()->user()?->hasRole('owner'))</a>@else</div>@endif
             @if(auth()->user()?->hasRole('owner'))
