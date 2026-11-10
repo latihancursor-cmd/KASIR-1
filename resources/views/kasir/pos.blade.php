@@ -58,6 +58,19 @@
         <span x-text="toastMessage"></span>
     </div>
 
+    <!-- Clear Cart Confirmation Modal -->
+    <div x-show="showClearConfirm" x-cloak class="fixed inset-0 bg-slate-900/45 backdrop-blur-sm z-[60] flex items-center justify-center p-4" @click.self="showClearConfirm = false" @keydown.escape.window="showClearConfirm = false">
+        <div x-transition class="w-full max-w-sm rounded-3xl border border-kasir-border bg-white p-6 text-center shadow-2xl">
+            <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-100 text-rose-600 text-2xl"><i class="fa-solid fa-trash-can"></i></div>
+            <h3 class="mb-2 text-lg font-bold text-kasir-text">Kosongkan Keranjang?</h3>
+            <p class="mb-6 text-sm text-gray-500">Semua item di keranjang akan dihapus. Produk dan stok tidak berubah.</p>
+            <div class="grid grid-cols-2 gap-3">
+                <button type="button" @click="showClearConfirm = false" class="rounded-xl border border-kasir-border px-4 py-2.5 text-sm font-semibold text-kasir-text hover:bg-kasir-bg transition">Batal</button>
+                <button type="button" @click="confirmClearCart()" class="rounded-xl bg-rose-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-rose-700 transition">Ya, Kosongkan</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Receipt Success Modal -->
     <div x-show="showReceipt" x-cloak class="fixed inset-0 bg-black/50 z-50 flex items-end md:items-center justify-center p-4" @click.self="closeReceipt()">
         <div @click.away="closeReceipt()" class="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden" x-transition>
@@ -134,7 +147,7 @@
                 <h3 class="text-base font-bold text-kasir-text">Keranjang</h3>
                 <p class="text-[10px] text-gray-500"><span x-text="cartCount"></span> item • Total: <span class="font-bold text-kasir-green" x-text="formatRupiah(cartTotal)"></span></p>
             </div>
-            <button @click="clearCart()" x-show="cart.length > 0" class="text-[10px] text-rose-500 hover:text-rose-700 font-semibold flex items-center gap-1">
+            <button @click="askClearCart()" x-show="cart.length > 0" class="text-[10px] text-rose-500 hover:text-rose-700 font-semibold flex items-center gap-1">
                 <i class="fa-solid fa-trash text-xs"></i> Hapus
             </button>
         </div>
@@ -199,6 +212,7 @@ function posApp() {
         isProcessing: false,
         showToast: false,
         showReceipt: false,
+        showClearConfirm: false,
         receiptData: { invoice_no: '', payment_method: '', total: 0, cash_paid: 0, change: 0, items: [] },
         toastMessage: '',
         toastTimer: null,
@@ -274,11 +288,14 @@ function posApp() {
             this.showNotification(productName + ' dihapus');
         },
 
-        clearCart() {
-            if (confirm('Hapus semua item dari keranjang?')) {
-                this.cart = [];
-                this.showNotification('Keranjang dikosongkan');
-            }
+        askClearCart() {
+            this.showClearConfirm = true;
+        },
+
+        confirmClearCart() {
+            this.cart = [];
+            this.showClearConfirm = false;
+            this.showNotification('Keranjang dikosongkan');
         },
 
         closeReceipt() {

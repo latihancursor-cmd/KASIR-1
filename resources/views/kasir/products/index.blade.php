@@ -71,13 +71,9 @@
                         <a href="{{ route('kasir.products.edit', $product) }}" class="w-8 h-8 rounded-lg bg-kasir-bg hover:bg-gray-200 flex items-center justify-center text-gray-600 transition">
                             <i class="fa-solid fa-pen text-xs"></i>
                         </a>
-                        <form method="POST" action="{{ route('kasir.products.destroy', $product) }}" onsubmit="return confirm('Hapus produk ini?')">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="w-8 h-8 rounded-lg bg-rose-50 hover:bg-rose-100 flex items-center justify-center text-rose-500 transition">
-                                <i class="fa-solid fa-trash text-xs"></i>
-                            </button>
-                        </form>
+                        <button type="button" onclick="openDeleteProductModal('{{ route('kasir.products.destroy', $product) }}', @js($product->name))" class="w-8 h-8 rounded-lg bg-rose-50 hover:bg-rose-100 flex items-center justify-center text-rose-500 transition" aria-label="Hapus produk">
+                            <i class="fa-solid fa-trash text-xs"></i>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -93,4 +89,41 @@
         </div>
         @endforelse
     </div>
+
+    <!-- Custom Delete Confirmation Modal -->
+    <dialog id="deleteProductModal" class="rounded-3xl p-0 border-0 bg-transparent backdrop:bg-slate-900/40 backdrop:backdrop-blur-xs max-w-sm w-full mx-auto shadow-2xl">
+        <div class="bg-white rounded-3xl p-6 border border-kasir-border text-center">
+            <div class="w-14 h-14 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center text-2xl mx-auto mb-4">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 class="text-lg font-bold text-kasir-text mb-1">Hapus Produk?</h3>
+            <p class="text-xs text-gray-500 mb-6">Produk <span id="deleteProductName" class="font-bold text-kasir-text"></span> akan dihapus permanen dan tidak dapat dikembalikan.</p>
+
+            <form id="deleteProductForm" method="POST" action="">
+                @csrf
+                @method('DELETE')
+                <div class="grid grid-cols-2 gap-3">
+                    <button type="button" onclick="document.getElementById('deleteProductModal').close()" class="w-full py-2.5 rounded-xl border border-kasir-border text-kasir-text font-semibold text-xs hover:bg-gray-50 transition">
+                        Batal
+                    </button>
+                    <button type="submit" class="w-full py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs transition shadow-xs">
+                        Ya, Hapus
+                    </button>
+                </div>
+            </form>
+        </div>
+    </dialog>
+
+    <script>
+        function openDeleteProductModal(actionUrl, productName) {
+            const modal = document.getElementById('deleteProductModal');
+            document.getElementById('deleteProductForm').action = actionUrl;
+            document.getElementById('deleteProductName').textContent = productName;
+            if (modal.showModal) {
+                modal.showModal();
+            } else {
+                modal.setAttribute('open', '');
+            }
+        }
+    </script>
 @endsection

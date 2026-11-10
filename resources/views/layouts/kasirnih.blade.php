@@ -127,29 +127,34 @@
         </div>
     </header>
 
-    <!-- ALERT NOTIFIKASI SUKSES / ERROR -->
-    @if(session('success'))
-        <div class="max-w-7xl mx-auto px-4 mt-4">
-            <div class="bg-emerald-100 border border-emerald-300 text-emerald-800 px-4 py-3 rounded-2xl flex items-center justify-between text-sm shadow-xs">
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-circle-check text-emerald-600 text-lg"></i>
-                    <span>{{ session('success') }}</span>
-                </div>
-                <button onclick="this.parentElement.remove()" class="text-emerald-600 hover:text-emerald-800"><i class="fa-solid fa-xmark"></i></button>
+    <!-- ALERT NOTIFIKASI SUKSES / ERROR (Auto Modal Popup) -->
+    @if(session('success') || session('error'))
+        <dialog id="sessionFlashModal" class="rounded-3xl p-0 border-0 bg-transparent backdrop:bg-slate-900/40 backdrop:backdrop-blur-xs max-w-sm w-full mx-auto shadow-2xl">
+            <div class="bg-white rounded-3xl p-6 border border-kasir-border text-center">
+                @if(session('success'))
+                    <div class="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-2xl mx-auto mb-4">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-kasir-text mb-2">Berhasil!</h3>
+                    <p class="text-sm text-gray-600 mb-6">{{ session('success') }}</p>
+                @else
+                    <div class="w-14 h-14 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center text-2xl mx-auto mb-4">
+                        <i class="fa-solid fa-circle-exclamation"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-kasir-text mb-2">Perhatian</h3>
+                    <p class="text-sm text-gray-600 mb-6">{{ session('error') }}</p>
+                @endif
+                <button type="button" onclick="document.getElementById('sessionFlashModal').close()" class="w-full py-2.5 rounded-xl bg-kasir-green hover:bg-kasir-darkGreen text-white font-bold text-sm transition">
+                    Tutup
+                </button>
             </div>
-        </div>
-    @endif
-
-    @if(session('error'))
-        <div class="max-w-7xl mx-auto px-4 mt-4">
-            <div class="bg-rose-100 border border-rose-300 text-rose-800 px-4 py-3 rounded-2xl flex items-center justify-between text-sm shadow-xs">
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-circle-exclamation text-rose-600 text-lg"></i>
-                    <span>{{ session('error') }}</span>
-                </div>
-                <button onclick="this.parentElement.remove()" class="text-rose-600 hover:text-rose-800"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-        </div>
+        </dialog>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const modal = document.getElementById('sessionFlashModal');
+                if (modal && modal.showModal) modal.showModal();
+            });
+        </script>
     @endif
 
     <!-- MAIN CONTENT -->
@@ -203,9 +208,29 @@
         </div>
     </div>
 
+    <!-- Custom Notification Popup -->
+    <dialog id="kasirNotificationModal" class="rounded-3xl p-0 border-0 bg-transparent backdrop:bg-slate-900/40 backdrop:backdrop-blur-xs max-w-sm w-full mx-auto shadow-2xl">
+        <div class="bg-white rounded-3xl p-6 border border-kasir-border text-center">
+            <div class="w-14 h-14 rounded-2xl bg-kasir-orange/15 text-kasir-orange flex items-center justify-center text-2xl mx-auto mb-4">
+                <i class="fa-solid fa-bell"></i>
+            </div>
+            <h3 class="text-lg font-bold text-kasir-text mb-2">Pengingat Tutup Kasir</h3>
+            <p class="text-sm text-gray-600 mb-1">Status Tutup Kasir Aktif.</p>
+            <p class="text-xs text-gray-500 mb-6">Jam pengingat: <span class="font-bold text-kasir-text">{{ $settings->closing_time ?? '21:00' }}</span></p>
+            <button type="button" onclick="document.getElementById('kasirNotificationModal').close()" class="w-full py-2.5 rounded-xl bg-kasir-green hover:bg-kasir-darkGreen text-white font-bold text-sm transition">
+                OK
+            </button>
+        </div>
+    </dialog>
+
     <script>
         function checkClosingStatus() {
-            alert('Status Tutup Kasir Aktif.\nJam pengingat: {{ $settings->closing_time ?? "21:00" }}');
+            const modal = document.getElementById('kasirNotificationModal');
+            if (modal.showModal) {
+                modal.showModal();
+            } else {
+                modal.setAttribute('open', '');
+            }
         }
     </script>
     @yield('scripts')
